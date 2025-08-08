@@ -1,0 +1,121 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 960px;
+    margin: 30px auto;
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+/* Современный стиль переключателя */
+.switch-container {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.switch input {
+    display: none; /* Скрываем стандартный чекбокс */
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 34px;
+    transition: background-color 0.3s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+/* Если переключатель включен */
+input:checked + .slider {
+    background-color: #4caf50;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+table th, table td {
+    border: 1px solid #333;
+    padding: 8px;
+    text-align: left;
+}
+table th {
+    background-color: #424242;
+    color: #fff;
+}
+.btn {
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+    margin-right: 5px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+.btn-success {
+    background-color: #28a745;
+}
+.btn-danger {
+    background-color: #dc3545;
+}
+.btn-warning {
+    background-color: #ffc107;
+    color: #121212;
+}
+.btn:hover {
+    opacity: 0.8;
+}
+/* Стиль для переключателя и меню */
+.menu {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.menu label {
+    margin-left: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}

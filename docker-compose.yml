@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  apache-php:
+    build: ./apache-php
+    ports:
+      - "9022:80"
+    volumes:
+      - ./html:/var/www/html
+    depends_on:
+      - mysql-master
+    networks:
+      - lampnet
+
+  mysql-master:
+    image: mysql:5.7
+    container_name: mysql-master
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: db_app
+      MYSQL_USER: repl_user
+      MYSQL_PASSWORD: replpass
+    volumes:
+      - ./mysql-master/init.sql:/docker-entrypoint-initdb.d/init.sql   # Изменено с init-slave.sql на init.sql
+    command:
+      --server-id=1
+      --log-bin=mysql-bin
+      --binlog-do-db=db_app
+      --binlog-format=ROW
+      --sync-binlog=1
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpass" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - lampnet
+
+  mysql-slave:
+    build: ./mysql-slave
+    container_name: mysql-slave
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: db_app
+    volumes:
+      - ./mysql-slave/slave-init.sh:/docker-entrypoint-initdb.d/slave-init.sh
+    command: --server-id=2
+      --relay-log=relay-log
+      --replicate-do-db=db_app
+    depends_on:
+      mysql-master:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpass" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - lampnet
+
+  nagios:
+    build: ./nagios
+    container_name: nagios
+    ports:
+      - "8080:80"
+    environment:
+      - NAGIOSADMIN_USER=admin
+      - NAGIOSADMIN_PASS=admin
+    volumes:
+#      - ./nagios/etc/cgi.cfg:/opt/nagios/etc/cgi.cfg
+      - ./nagios/etc/nagios.cfg:/opt/nagios/etc/nagios.cfg
+      - ./nagios/etc/objects:/opt/nagios/etc/objects
+      - ./nagios/plugins:/opt/nagios/libexec/custom
+    depends_on:
+      - apache-php
+      - mysql-master
+      - mysql-slave
+    networks:
+      - lampnet
+
+networks:
+  lampnet:
+    driver: bridge
